@@ -1,4 +1,4 @@
-import logo from "@/assets/logo_eletrostar.jpg";
+import logo from "@/assets/logo_eletrostar.png";
 
 const Footer = () => (
   <footer className="border-t border-border py-12 bg-background">
