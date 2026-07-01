@@ -23,6 +23,9 @@ const Footer = () => (
         <p className="text-sm text-muted-foreground">
           © {new Date().getFullYear()} Eletrostar Software e Hardware. Todos os direitos reservados.
         </p>
+        <p className="text-sm text-muted-foreground mt-1">
+          CNPJ 25.278.670/0001-03
+        </p>
       </div>
     </div>
   </footer>

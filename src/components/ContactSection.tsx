@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -41,9 +41,10 @@ const ContactSection = () => {
             viewport={{ once: true }}
           >
             {[
-              { icon: Phone, label: "Telefone", value: "(11) 9999-9999" },
+              { icon: Phone, label: "Telefone", value: "(21) 3574-9780" },
               { icon: Mail, label: "E-mail", value: "contato@eletrostar.com.br" },
-              { icon: MapPin, label: "Endereço", value: "São Paulo, SP - Brasil" },
+              { icon: MapPin, label: "Endereço", value: "Rua Correa Dutra nº 149, Flamengo, Rio de Janeiro, RJ, CEP 22.210-050" },
+              { icon: MessageCircle, label: "WhatsApp Business", value: "(21) 3574-9780", href: "https://wa.me/552135749780" },
             ].map((item) => (
               <div key={item.label} className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -51,7 +52,18 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <div className="font-medium text-foreground">{item.label}</div>
-                  <div className="text-muted-foreground">{item.value}</div>
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {item.value}
+                    </a>
+                  ) : (
+                    <div className="text-muted-foreground">{item.value}</div>
+                  )}
                 </div>
               </div>
             ))}
