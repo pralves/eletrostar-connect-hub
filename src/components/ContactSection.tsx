@@ -2,18 +2,50 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, MessageCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 const ContactSection = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [isSending, setIsSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Mensagem enviada!", description: "Entraremos em contato em breve." });
-    setFormData({ name: "", email: "", message: "" });
+    setIsSending(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = (await response.json().catch(() => null)) as
+        | { success: boolean; error?: string }
+        | null;
+
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error ?? "Falha ao enviar a mensagem.");
+      }
+
+      toast({
+        title: "Mensagem enviada!",
+        description: "Enviamos uma confirmação para o seu e-mail. Entraremos em contato em breve.",
+      });
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Não foi possível enviar",
+        description: "Tente novamente ou fale conosco pelo WhatsApp.",
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -81,6 +113,7 @@ const ContactSection = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
+              disabled={isSending}
               className="bg-muted border-border"
             />
             <Input
@@ -89,6 +122,7 @@ const ContactSection = () => {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
+              disabled={isSending}
               className="bg-muted border-border"
             />
             <Textarea
@@ -97,10 +131,18 @@ const ContactSection = () => {
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               required
+              disabled={isSending}
               className="bg-muted border-border resize-none"
             />
-            <Button type="submit" size="lg" className="w-full shadow-glow">
-              Enviar Mensagem
+            <Button type="submit" size="lg" disabled={isSending} className="w-full shadow-glow">
+              {isSending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                "Enviar Mensagem"
+              )}
             </Button>
           </motion.form>
         </div>

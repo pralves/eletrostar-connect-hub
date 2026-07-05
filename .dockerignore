@@ -1,0 +1,25 @@
+# Node / build
+node_modules
+dist
+dist-ssr
+
+# Backend (tem seu próprio Dockerfile/contexto)
+server
+
+# Não vazar .env no build do frontend — o VITE_API_URL vem por ARG.
+# (evita que .env sobrescreva o valor de produção)
+.env
+.env.*
+
+# Infra / git / editor
+.git
+.github
+.claude
+supabase
+Dockerfile
+.dockerignore
+docker-compose.yml
+bun.lockb
+bun.lock
+*.log
+*.md

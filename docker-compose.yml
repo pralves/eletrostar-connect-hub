@@ -1,0 +1,54 @@
+# Deploy do site EletroStar: backend (api) + frontend (web/Nginx).
+#
+# Uso no VPS:
+#   1. cp server/.env.example server/.env  (e preencha SUPABASE_* e SMTP_*)
+#   2. docker compose up -d --build
+#   3. Acesse http://SEU_HOST:${WEB_PORT:-8080}
+#
+# O frontend (web) faz proxy de /api para o backend (api) pela rede interna,
+# então a porta do backend NÃO é publicada — só o web fica exposto.
+
+services:
+  api:
+    build:
+      context: ./server
+    image: eletrostar-api:latest
+    container_name: eletrostar-api
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    expose:
+      - "3001"
+    networks:
+      - eletrostar
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Vazio => front chama /api na mesma origem (proxy do Nginx).
+        VITE_API_URL: ""
+    image: eletrostar-web:latest
+    container_name: eletrostar-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    networks:
+      - eletrostar
+
+networks:
+  eletrostar:
+    driver: bridge
